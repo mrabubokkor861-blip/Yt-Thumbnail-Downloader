@@ -4,26 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('errorMessage');
     const resultsSection = document.getElementById('resultsSection');
 
-    // Advanced Parser for all YT Link types (watch?v=, youtu.be, shorts)
-    const extractVideoID = (url) => {
-        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/i;
-        const match = url.match(regex);
-        return match ? match[1] : null;
+    // Robust Youtube ID Extractor (Shorts, Standard, & Mobile Links)
+    const getYouTubeID = (url) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
     };
 
-    // Verify if Thumbnail actually exists (YT returns a 120px gray placeholder if it fails)
-    const verifyImage = (url) => {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img.width > 120 ? url : null);
-            img.onerror = () => resolve(null);
-            img.src = url;
-        });
-    };
-
-    const handleExtraction = async () => {
+    const processExtraction = () => {
         const url = urlInput.value.trim();
-        const videoID = extractVideoID(url);
+        const videoID = getYouTubeID(url);
 
         if (!videoID) {
             errorMessage.classList.remove('hidden');
@@ -32,69 +22,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         errorMessage.classList.add('hidden');
-        resultsSection.innerHTML = ''; // Clear previous results
+        resultsSection.innerHTML = ''; 
         resultsSection.classList.remove('hidden');
 
-        // Quality mappings based on standard YouTube API structure
+        // 3 Exact Qualities in Descending Order
         const qualities = [
-            { label: 'High Quality (HD - 1280x720)', id: 'maxresdefault' },
-            { label: 'Medium Quality (SD - 640x480)', id: 'sddefault' },
-            { label: 'Normal Quality (MQ - 480x360)', id: 'hqdefault' }
+            { title: 'High Quality (HD - 1280x720)', key: 'maxresdefault' },
+            { title: 'Medium Quality (SD - 640x480)', key: 'sddefault' },
+            { title: 'Normal Quality (MQ - 480x360)', key: 'hqdefault' }
         ];
 
-        // Process and inject cards efficiently
-        for (const quality of qualities) {
-            const imgUrl = `https://i.ytimg.com/vi/${videoID}/${quality.id}.jpg`;
-            const validUrl = await verifyImage(imgUrl);
+        qualities.forEach(q => {
+            const imgUrl = `https://img.youtube.com/vi/${videoID}/${q.key}.jpg`;
             
-            if (validUrl) {
-                const card = document.createElement('div');
-                card.className = 'thumbnail-card glass-panel';
-                card.innerHTML = `
-                    <div class="quality-badge">${quality.label}</div>
-                    <div class="img-container">
-                        <img src="${validUrl}" alt="YouTube Thumbnail - ${quality.label}" loading="lazy">
-                    </div>
-                    <button class="download-btn" onclick="triggerDownload('${validUrl}', 'YT_Thumbnail_${videoID}_${quality.id}.jpg')">
-                        Download Thumbnail
-                    </button>
-                `;
-                resultsSection.appendChild(card);
-            }
-        }
+            const card = document.createElement('div');
+            card.className = 'thumbnail-card glass-card';
+            card.innerHTML = `
+                <div class="badge">${q.title}</div>
+                <div class="img-wrapper">
+                    <img src="${imgUrl}" alt="${q.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${videoID}/hqdefault.jpg'">
+                </div>
+                <a href="${imgUrl}" target="_blank" download="Thumbnail_${videoID}.jpg" class="download-link">
+                    Download Thumbnail
+                </a>
+            `;
+            resultsSection.appendChild(card);
+        });
     };
 
-    // Event Listeners
-    extractBtn.addEventListener('click', handleExtraction);
+    extractBtn.addEventListener('click', processExtraction);
     urlInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleExtraction();
+        if (e.key === 'Enter') processExtraction();
     });
 });
-
-// Robust cross-origin download logic 
-// Attempts a direct force-download, falls back to a clean new tab view if CORS blocks it
-window.triggerDownload = async (url, filename) => {
-    try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-        // Fallback for strict browser CORS implementations
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-};
