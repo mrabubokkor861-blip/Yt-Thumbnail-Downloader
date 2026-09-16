@@ -1,54 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <!-- Advanced High-CTR SEO & Keywords -->
-    <title>Free YouTube Thumbnail Downloader - Get HD & 4K Thumbnails</title>
-    <meta name="description" content="Download high-quality YouTube thumbnails instantly for free. Save HD, SD, and 1080p covers with 1-click on mobile & PC. Fast, clean & 100% secure.">
-    <meta name="keywords" content="youtube thumbnail downloader, download yt thumbnail, 1080p youtube thumbnail saver, youtube cover grabber, free yt image downloader">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="ThumbnailDownloader">
-
-    <!-- Open Graph for Social Sharing -->
-    <meta property="og:title" content="Free YouTube Thumbnail Downloader - Extract HD Covers Instantly">
-    <meta property="og:description" content="Instantly download high-quality YouTube thumbnails in HD, SD, and MQ. 100% Free & Blazing Fast.">
-    <meta property="og:type" content="website">
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube Thumbnail Downloader</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>YouTube Thumbnail Downloader</h1>
+      <p>Paste any YouTube video link to download high-resolution thumbnails instantly.</p>
+    </header>
 
-    <main class="app-container">
-        <!-- 1:1 Pure White Y Logo -->
-        <header class="header">
-            <div class="logo-box">
-                <span>Y</span>
-            </div>
-            <h1 class="title">Thumbnail Downloader</h1>
-            <p class="subtitle">Extract HD thumbnails from any YouTube video or Short</p>
-        </header>
+    <div class="input-section">
+      <input type="text" id="video-url" placeholder="Paste YouTube Video URL here... (e.g. https://www.youtube.com/watch?v=...)" />
+      <button id="get-btn">Get Thumbnails</button>
+    </div>
 
-        <!-- Search Box -->
-        <section class="search-section glass-card">
-            <div class="input-wrapper">
-                <input type="url" id="urlInput" placeholder="Paste YouTube video or Shorts link here..." autocomplete="off">
-                <button id="extractBtn" type="button">Get Thumbnail</button>
-            </div>
-            <p id="errorMessage" class="error-msg hidden">Please enter a valid YouTube URL</p>
-        </section>
+    <div id="error-msg" class="error hidden">Please enter a valid YouTube video URL.</div>
 
-        <!-- Thumbnail Results -->
-        <section id="resultsSection" class="results-section hidden">
-            <!-- Dynamic Thumbnails Rendered via JavaScript -->
-        </section>
-    </main>
+    <div id="results" class="results-grid hidden">
+      <!-- Maximum Resolution -->
+      <div class="card">
+        <h3>HD / 4K Resolution (1080p / 720p)</h3>
+        <img id="img-maxres" src="" alt="Max Resolution Thumbnail" />
+        <a id="download-maxres" class="download-btn" download target="_blank">Download High Quality</a>
+      </div>
 
-    <!-- Adsterra Script File -->
-    <script src="ads.js" defer></script>
-    <!-- Core Application Logic -->
-    <script src="app.js" defer></script>
+      <!-- Standard Resolution -->
+      <div class="card">
+        <h3>Standard Quality (640x480)</h3>
+        <img id="img-sd" src="" alt="Standard Resolution Thumbnail" />
+        <a id="download-sd" class="download-btn" download target="_blank">Download Standard Quality</a>
+      </div>
 
+      <!-- Medium Resolution -->
+      <div class="card">
+        <h3>Medium Quality (480x360)</h3>
+        <img id="img-mq" src="" alt="Medium Resolution Thumbnail" />
+        <a id="download-mq" class="download-btn" download target="_blank">Download Medium Quality</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
