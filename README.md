@@ -1,1 +1,0 @@
-# Yt-Thumbnail-Downloader
